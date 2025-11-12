@@ -47,12 +47,25 @@ class LogExporter(threading.Thread):
         self._stop_event.set()
 
     def _flush(self, records: List[TraceRecord]) -> None:
-        payload = {
+        # Separate error records (status >= 400) from regular records
+        error_records = [r for r in records if r.status_code >= 400]
+        all_records_payload = {
             "records": [record.to_payload() for record in records],
             "ingestion_version": 1,
         }
+
         try:
-            asyncio.run(self._client.send_logs(payload))
+            # Send all records for aggregation
+            asyncio.run(self._client.send_logs(all_records_payload))
+
+            # Send error records for detailed debugging
+            if error_records:
+                error_payload = {
+                    "records": [record.to_payload() for record in error_records],
+                    "ingestion_version": 1,
+                }
+                asyncio.run(self._client.send_error_logs(error_payload))
+
         except Exception as exc:
             if self.config.enable_console_fallback:
                 print(f"[trace_logger] failed to export logs: {exc}")

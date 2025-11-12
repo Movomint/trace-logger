@@ -11,3 +11,6 @@ class InternalObservabilityService(BaseHTTPService):
 
     async def send_logs(self, payload: dict) -> None:
         await self._call_("POST", "/observability/logs", json=payload)
+
+    async def send_error_logs(self, payload: dict) -> None:
+        await self._call_("POST", "/observability/error-logs", json=payload)
