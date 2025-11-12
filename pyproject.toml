@@ -1,0 +1,13 @@
+[project]
+name = "trace_logger"
+version = "0.1.0"
+description = "Simple trace logging utility for internal services"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "interservice",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
